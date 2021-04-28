@@ -1,2 +1,2 @@
-# swx4
-MQTT Switch x 4
+# swx5
+Homie MQTT Switch x 5
