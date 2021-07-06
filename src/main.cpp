@@ -7,16 +7,22 @@
 
 const unsigned int NUMBER_OF_BUTTONS = 6;
 const unsigned char GPIOS[NUMBER_OF_BUTTONS] = { 13, 12, 14, 16, 2, 4 };
-const String opts = String("on ON 1 off OFF 0");
 
 HomieNode nodeDevice ("device", "Device", "device");
-HomieNode nodePorts ("button", "Buttons", "button");
+HomieNode nodeSwitches ("switches", "Switches", "switch");
 
-Sequence<unsigned char> sequence("buttons");
+HomieSetting<const char*> s1("1", "Configuration for switch #1");
+HomieSetting<const char*> s2("2", "Configuration for switch #2");
+HomieSetting<const char*> s3("3", "Configuration for switch #3");
+HomieSetting<const char*> s4("4", "Configuration for switch #4");
+HomieSetting<const char*> s5("5", "Configuration for switch #5");
+HomieSetting<const char*> s6("6", "Configuration for switch #6");
+
+Sequence<unsigned char> sequence("switches");
 
 bool sequenceHandler(const HomieRange &range, const String &value){
     unsigned long totalDuration = 0;
-    int i = 0;
+    unsigned int i = 0;
     int j = 0;
     String t;
     unsigned int multiple = 1;
@@ -37,6 +43,7 @@ bool sequenceHandler(const HomieRange &range, const String &value){
     if (t=="h") multiple = 3600000;
 
     i=j+1;
+    while(i <= value.length()){
         j = value.indexOf(',',i);
         if (j<0) {
             DEBUG_PRINT("break\n");
@@ -99,7 +106,7 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
     bool updated = false;
     String newValue = value;
 
-    if (strcmp(node.getId(),"io") == 0){
+    if (strcmp(node.getType(),"switch") == 0){
         unsigned char port = property.charAt(0)-49;
         newValue = value == "true"?"true":"false";
         digitalWrite(GPIOS[port],value == "true");
@@ -108,7 +115,7 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
 
     if (updated) {
         node.setProperty(property).send(newValue);
-        Homie.getLogger() << "Property " << property << " set to " << newValue << endl;
+        Homie.getLogger() << "Node '"<< node.getId() << "' property '" << property << "' set to " << newValue << endl;
     }
 
     return updated;
@@ -125,12 +132,12 @@ void handleSequenceStop(){
 
 void handleStepStart(SeqStep<unsigned char> *step){
     digitalWrite(step->item,1);
-    nodePorts.setProperty(String(step->item)).send("true");
+    nodeSwitches.setProperty(String(step->item)).send("true");
 }
 
 void handleStepStop(SeqStep<unsigned char> *step){
     digitalWrite(step->item,0);
-    nodePorts.setProperty(String(step->item)).send("false");
+    nodeSwitches.setProperty(String(step->item)).send("false");
 }
 
 
@@ -143,7 +150,7 @@ void setup() {
     Serial.begin(115200);
     Serial << endl << endl;
 
-    Homie_setFirmware("IOCtrl", "1.0.0");
+    Homie_setFirmware("Switchesx6", "1.0.0");
     Homie.setGlobalInputHandler(updateHandler);
     Homie.setLedPin(15, 1);  
 
@@ -151,13 +158,20 @@ void setup() {
     nodeDevice.advertise("seqStatus").setDatatype("integer");
     nodeDevice.advertise("cmd").setDatatype("string").settable(cmdHandler);
 
-    nodePorts.advertise("1").setDatatype("boolean").settable();
-    nodePorts.advertise("2").setDatatype("boolean").settable();
-    nodePorts.advertise("3").setDatatype("boolean").settable();
-    nodePorts.advertise("4").setDatatype("boolean").settable();
-    nodePorts.advertise("5").setDatatype("boolean").settable();
-    nodePorts.advertise("6").setDatatype("boolean").settable();
+    nodeSwitches.advertise("1").setDatatype("boolean").settable();
+    nodeSwitches.advertise("2").setDatatype("boolean").settable();
+    nodeSwitches.advertise("3").setDatatype("boolean").settable();
+    nodeSwitches.advertise("4").setDatatype("boolean").settable();
+    nodeSwitches.advertise("5").setDatatype("boolean").settable();
+    nodeSwitches.advertise("6").setDatatype("boolean").settable();
 
+    // all switches are set as non-momentary by default
+    s1.setDefaultValue("nm");
+    s2.setDefaultValue("nm");
+    s3.setDefaultValue("nm");
+    s4.setDefaultValue("nm");
+    s5.setDefaultValue("nm");
+    s6.setDefaultValue("nm");
     Homie.setup();
 
     sequence.handleOnStart(handleSequenceStart);

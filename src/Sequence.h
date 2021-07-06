@@ -36,6 +36,8 @@ class Sequence {
         stepEvent_cb_t onStepStart = nullptr;
         stepEvent_cb_t onStepStop = nullptr;
 
+        void _add(SeqStep<T> *step);
+
     public:
         Sequence(const char *id);
         void add(T item, unsigned long duration);
@@ -63,26 +65,45 @@ Sequence<T>::Sequence(const char* id){
 }
 
 template <class T>
+void Sequence<T>::_add(SeqStep<T> *step){
+    if (sequence) {
+        SeqStep<T> *i = sequence;
+        while (i->next) i = i->next;
+        i->next = step;
+    } else {
+        sequence = step;
+    }
+
+    sequenceDuration += step->duration;
+    sequenceLength++;
+
+    DEBUG_PRINT("[Sequence %s] Added step %d\n", id, step->id);
+}
+
+
+template <class T>
 void Sequence<T>::add(T item, unsigned long duration){
     SeqStep<T> *s = new SeqStep<T>();
+    s->pause = 0;
     s->duration = duration;
     s->item = item;
     s->next = nullptr;
     s->id = sequenceLength + 1;
 
-    if (sequence) {
-        SeqStep<T> *i = sequence;
-        while (i->next) i = i->next;
-        i->next = s;
-    } else {
-        sequence = s;
-    }
-
-    sequenceDuration += duration;
-    sequenceLength++;
-
-    DEBUG_PRINT("[Sequence %s] Added step %d\n", id, s->id);
+    _add(s);
 }
+
+template <class T>
+void Sequence<T>::addPause(unsigned long duration){
+    SeqStep<T> *s = new SeqStep<T>();
+    s->pause = 1;
+    s->duration = duration;
+    s->next = nullptr;
+    s->id = sequenceLength + 1;
+
+    _add(s);
+}
+
 
 template <class T>
 void Sequence<T>::clear(){
