@@ -37,8 +37,7 @@ bool sequenceHandler(const HomieRange &range, const String &value){
     if (t=="h") multiple = 3600000;
 
     i=j+1;
-    while(i<=value.length()){
-        j = value.indexOf(':',i);
+        j = value.indexOf(',',i);
         if (j<0) {
             DEBUG_PRINT("break\n");
             break;
