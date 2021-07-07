@@ -1,7 +1,7 @@
 #include "Switch.h"
 #include <Arduino.h>
 
-//#define NODEBUG_PRINT
+#define NODEBUG_PRINT
 #include "debug_print.h"
 
 Switch::Switch(const char* id){

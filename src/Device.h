@@ -11,7 +11,7 @@ class Device {
 
     public:
         List<GPIOSwitch> switches;
-        ListIterator<GPIOSwitch> *switchIterator = nullptr;
+        ListIterator<GPIOSwitch> *switchIterator = nullptr; // helper for the loop method
         Sequence<unsigned char> sequence = Sequence<unsigned char>("switches");
         HomieNode homieDevice = HomieNode("device", "Device", "device");
         HomieNode homieSwitches = HomieNode("switches", "Switches", "switch");

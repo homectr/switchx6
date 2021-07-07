@@ -3,7 +3,7 @@
 #include "Device.h"
 #include "handlers.h"
 
-//#define NODEBUG_PRINT
+#define NODEBUG_PRINT
 #include "debug_print.h"
 
 Device device;
@@ -26,9 +26,11 @@ unsigned long ms = millis();
 void loop() {
     Homie.loop();
     device.loop();
+    #ifndef NODEBUG_PRINT
     if (millis()-ms > 5000){
         ms = millis();
         DEBUG_PRINT("[main] alive\n");
     }
+    #endif
     
 }

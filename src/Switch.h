@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Homie.h>
-
 class Switch {
     using event_cb_t = void(*)(Switch*);
     protected:

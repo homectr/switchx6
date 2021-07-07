@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include "handlers.h"
 
-//#define NODEBUG_PRINT
+#define NODEBUG_PRINT
 #include "debug_print.h"
 
 const unsigned char GPIOS[NUMBER_OF_SWITCHES] = { 13, 12, 14, 16, 2, 4 };
