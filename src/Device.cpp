@@ -8,9 +8,6 @@
 const unsigned char GPIOS[NUMBER_OF_SWITCHES] = { 13, 12, 14, 16, 2, 4 };
 
 Device::Device(){
-
-    DEBUG_PRINT("Dev-List %X\n",switches);
-
     for (uint8_t i = 0; i < NUMBER_OF_SWITCHES; i++) {
 
         // initialize GPIO
@@ -50,21 +47,16 @@ void Device::setup(){
     DEBUG_PRINT("[Device] SETUP\n");
     // process Homie settings
     for (int i=0; i<NUMBER_OF_SWITCHES;i++){
-        DEBUG_PRINT("i=%d",i);
         const char* s = scfg[i]->get();
-        DEBUG_PRINT(" cfg=%s",s);
         int t = 0;
         if (*s == 'm'){ // momentary
             t = atoi(s+2);
             if (t<0) t=10;
         }
-        DEBUG_PRINT(" t=%d",t);
         Switch* sw = switches.get(String(i+1).c_str());
-        DEBUG_PRINT(" sw=%X\n",t);
         if (sw) sw->setMomentary(t);
         DEBUG_PRINT("[Device] Switch %s momentary=%d\n",sw->getId(),t);
     }
-    DEBUG_PRINT("[Device] SETUP done\n");
 
     switchIterator = new ListIterator<GPIOSwitch>(switches);
 }
