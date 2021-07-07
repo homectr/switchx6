@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <Arduino.h>
 
 //#define NODEBUG_PRINT
 #include "debug_print.h"
