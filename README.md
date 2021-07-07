@@ -7,6 +7,26 @@ device|seqStatus|Property exposing sequence processing status 0-100% <br/>`mqtt 
 device|cmd|Property used forsending commands to device.<br/>`mqtt topic=homie/device/cmd/set`
 switch|1-6|Property for accessing specific switch 1-6.<br/>`mqtt topic=homie/switch/1`<br/>`mqtt topic=homie/switch/1/set`
 
+## Custom Settings
+Homie configuration file can be used to set switches to momentary mode (not latching).
+It is possible to set a timeout for each switch after which such switch will be released.
+
+**Example**
+Following example sets switches 1 & 2 to momentary mode, releasing after 100ms.
+All other switches are non-momentary. 
+If no configuration is provided, then all switches are non-momentary by default.
+
+```
+    "settings": {
+        "1":"m:100",
+        "2":"m:100",
+        "3":"nm",
+        "4":"nm",
+        "5":"nm",
+        "6":"nm"
+    }
+```
+
 ## Commands
 `sequence_stop` - immediately stops currently running sequence
 
