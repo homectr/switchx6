@@ -1,10 +1,10 @@
 #include "handlers.h"
-#include "Device.h"
+#include "Thing.h"
 
 //#define NODEBUG_PRINT
 #include "debug_print.h"
 
-extern Device device;
+extern Thing thing;
 
 bool sequenceHandler(const HomieRange &range, const String &value){
     unsigned long totalDuration = 0;
@@ -46,10 +46,10 @@ bool sequenceHandler(const HomieRange &range, const String &value){
 
         if (port>0){
             DEBUG_PRINT("Adding to sequence: port=%d duration=%lu\n",port,duration);
-            device.sequence.add(port,duration);
+            thing.sequence.add(port,duration);
         } else {
             DEBUG_PRINT("Adding pause to sequence: duration=%lu\n",duration);
-            device.sequence.addPause(duration);
+            thing.sequence.addPause(duration);
         }
 
         if (j<0) {
@@ -62,9 +62,9 @@ bool sequenceHandler(const HomieRange &range, const String &value){
     }  
 
     if (totalDuration > 0) {
-        device.homieDevice.setProperty("seq").send(String(totalDuration));  // send total sequence duraton in ms back
+        thing.homieDevice.setProperty("seq").send(String(totalDuration));  // send total sequence duraton in ms back
         Homie.getLogger() << "Total sequence duration is " << totalDuration << endl;
-        device.sequence.start();
+        thing.sequence.start();
     }
 
     return totalDuration > 0;
@@ -75,12 +75,12 @@ bool cmdHandler(const HomieRange &range, const String &value){
     bool updated = false;
 
     if (value == "seqence_stop") {
-        device.sequence.stop();
+        thing.sequence.stop();
         updated = true;
     }
 
     if (updated) {
-        device.homieDevice.setProperty("cmd").send(value);  // Update the state of the led
+        thing.homieDevice.setProperty("cmd").send(value);  // Update the state of the led
         Homie.getLogger() << "Cmd is " << value << endl;
     }
 
@@ -94,7 +94,7 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
     String newValue = value;
 
     if (strcmp(node.getType(),"switch") == 0){
-        GPIOSwitch *s = device.switches.get(property.c_str());
+        GPIOSwitch *s = thing.switches.get(property.c_str());
         if (s) {
             newValue = value == "true"?"true":"false";
             if (value == "true") s->on();
@@ -113,28 +113,28 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
 }
 
 void handleSequenceStart(){
-    device.homieDevice.setProperty("seqStatus").send("1");
+    thing.homieDevice.setProperty("seqStatus").send("1");
 }
 
 void handleSequenceStop(){
-    device.homieDevice.setProperty("seqStatus").send("0");
-    device.sequence.clear();
+    thing.homieDevice.setProperty("seqStatus").send("0");
+    thing.sequence.clear();
 }
 
 void handleStepStart(SeqStep<unsigned char> *step){
     digitalWrite(step->item,1);
-    device.homieSwitches.setProperty(String(step->item)).send("true");
+    thing.homieSwitches.setProperty(String(step->item)).send("true");
 }
 
 void handleStepStop(SeqStep<unsigned char> *step){
     digitalWrite(step->item,0);
-    device.homieSwitches.setProperty(String(step->item)).send("false");
+    thing.homieSwitches.setProperty(String(step->item)).send("false");
 }
 
 void handleSwitchOn(Switch* s){
-    device.homieSwitches.setProperty(s->getId()).send("true");
+    thing.homieSwitches.setProperty(s->getId()).send("true");
 }
 
 void handleSwitchOff(Switch* s){
-    device.homieSwitches.setProperty(s->getId()).send("false");
+    thing.homieSwitches.setProperty(s->getId()).send("false");
 }

@@ -4,8 +4,8 @@
 #define NODEBUG_PRINT
 #include "debug_print.h"
 
-Switch::Switch(const char* id){
-    this->id = id;
+Switch::Switch(const char* id):Item(id){
+    
 }
 
 void Switch::on(){

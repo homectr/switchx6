@@ -2,28 +2,38 @@
 
 #include <Homie.h>
 #include "List.h"
+#include "Item.h"
 #include "Switch.h"
 #include "Sequence.h"
 
-const unsigned int NUMBER_OF_SWITCHES = 6;
+const unsigned int NUMBER_OF_ITEMS = 6;
 
-class Device {
+class Thing {
 
     public:
+        Item* items[NUMBER_OF_ITEMS];
+
         List<GPIOSwitch> switches;
         ListIterator<GPIOSwitch> *switchIterator = nullptr; // helper for the loop method
         Sequence<unsigned char> sequence = Sequence<unsigned char>("switches");
+
+
         HomieNode homieDevice = HomieNode("device", "Device", "device");
         HomieNode homieSwitches = HomieNode("switches", "Switches", "switch");
-        HomieSetting<const char*> *scfg[NUMBER_OF_SWITCHES];
+        HomieNode homiePWM = HomieNode("pwm", "PWM Ports", "pwm");
+        HomieSetting<const char*> *scfg[NUMBER_OF_ITEMS];
 
     protected:
         unsigned long seqStatusUpdatedOn = 0;
         unsigned long aliveTimer = 0;
 
+        Item* createItem(const char* cfg);
+        Switch* createSwitch(const char* cfg);
+
     public:
-        Device();
+        Thing();
         void setup(); // call after Homie.setup()
         void loop();
 
 };
+
