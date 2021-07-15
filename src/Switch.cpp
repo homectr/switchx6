@@ -34,7 +34,6 @@ void GPIOSwitch::on(){
     Switch::on();
     digitalWrite(pin,!inverse);
     DEBUG_PRINT("[GPIO-%d] on\n",pin);
-
 }
 
 void GPIOSwitch::off(){
@@ -42,3 +41,4 @@ void GPIOSwitch::off(){
     Switch::off();
     DEBUG_PRINT("[GPIO-%d] off\n",pin);
 }
+

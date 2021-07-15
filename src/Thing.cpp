@@ -22,12 +22,11 @@ Thing::Thing(){
     homieDevice.advertise("seq").setDatatype("string").settable(sequenceHandler);
     homieDevice.advertise("seqStatus").setDatatype("integer");
 
-    /*
     sequence.handleOnStart(handleSequenceStart);
     sequence.handleOnStop(handleSequenceStop);
     sequence.handleOnStepStart(handleStepStart);
     sequence.handleOnStepStop(handleStepStop);
-    */
+    
     DEBUG_PRINT("[Thing:Thing] Thing created\n");
 }
 
@@ -56,7 +55,7 @@ Switch* Thing::createSwitch(const char* cfgDelim){
 
     // if 3rd token is 'm' then it is a momentary switch
     const char* momt = strtok(NULL,cfgDelim);
-    if (strcmp(momt,"m")){
+    if (strcmp(momt,"m") == 0){
         const char* mtStr = strtok(NULL,cfgDelim);
         if (mtStr){
             long mt = atol(mtStr);
@@ -70,11 +69,48 @@ Switch* Thing::createSwitch(const char* cfgDelim){
     DEBUG_PRINT("\n");
 
     // configure Homie property for the switch
-    homieSwitches.advertise(id).setDatatype("boolean").setRetained(false).settable();       
+    homieSwitches.advertise(id).setDatatype("boolean").setRetained(true).settable();       
 
     return sw;
 
 }
+
+PWMPort* Thing::createPWM(const char* cfgDelim){
+    PWMPort *sw = NULL;
+
+    const char* id = strtok(NULL, cfgDelim);
+    const char* gpioStr = strtok(NULL, cfgDelim);
+
+    if (!id || !gpioStr) return sw;
+
+    int gpio = atoi(gpioStr);
+    if (gpio < 0) return sw;
+
+    // create switch for GPIO
+    sw = new PWMPort(strdup(id), gpio);
+    sw->setCbOnChange(handlePWM);
+
+    DEBUG_PRINT("PWM created: id=%s gpio=%d", id, gpio);
+    
+    pwm.add(id,sw);
+
+    const char* dcStr = strtok(NULL,cfgDelim);
+    if (dcStr){
+        unsigned int dc = atol(dcStr);
+        if (dc>0 && dc <=100) {
+            sw->setDutyCycle(dc);
+            DEBUG_PRINT(" duty=%lu",dc);
+        }        
+    }
+    DEBUG_PRINT("\n");
+
+    // configure Homie property for the switch
+    homiePWM.advertise(id).setDatatype("integer").setFormat("0:100").setRetained(true).settable();       
+
+    return sw;
+
+}
+
 
 Item* Thing::createItem(const char* cfg){
     DEBUG_PRINT("Creating item using config=%s\n",cfg);
@@ -97,6 +133,10 @@ Item* Thing::createItem(const char* cfg){
         return (Item*)createSwitch(cfgDelim);
     }
 
+    if (strcmp(tok,"pwm") == 0){
+        return (Item*)createPWM(cfgDelim);
+    }
+
     return item;
 }
 
@@ -114,21 +154,24 @@ void Thing::setup(){
         if (itemCfg[i]) items[i] = createItem(itemCfg[i]->get());
     }
 
-    switchIterator = new ListIterator<GPIOSwitch>(switches);
-
     DEBUG_PRINT("[Thing:Setup] Completed\n");
 
     configured = true;
 }
 
 void Thing::loop(){
+    #ifndef NODEBUG_PRINT
+    if (millis()-aliveTimer > 15000){
+        aliveTimer = millis();
+        DEBUG_PRINT("[Thing] alive ms=%lu\n",millis());
+        if (!isConfigured()) 
+            DEBUG_PRINT("[Thing] not configured. Skipping loop.\n");
+    }
+    #endif
+
     if (!isConfigured()) return;
-    DEBUG_PRINT(" TL ");
     for (int i=0;i<NUMBER_OF_ITEMS;i++){
-        if (items[i]) {
-            DEBUG_PRINT(" ITL=%d",i);
-            items[i]->loop();
-        }
+        if (items[i]) items[i]->loop();        
     }
 
     sequence.loop();
@@ -139,12 +182,5 @@ void Thing::loop(){
         // send sequence processing status 0-100%
         homieDevice.setProperty("seqStatus").send(String(sequence.running()));
     }
-
-    #ifndef NODEBUG_PRINT
-    if (millis()-aliveTimer > 15000){
-        aliveTimer = millis();
-        DEBUG_PRINT("[Thing] alive ms=%lu\n",millis());
-    }
-    #endif
     
 }

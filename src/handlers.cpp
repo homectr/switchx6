@@ -95,13 +95,24 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
 
     if (strcmp(node.getType(),"switch") == 0){
         GPIOSwitch *s = thing->switches.get(property.c_str());
-        if (s) {
-            newValue = value == "true"?"true":"false";
-            if (value == "true") s->on();
-            else s->off();
-            
-            updated = true;
-        }
+        if (!s) return; // no such proprety
+        newValue = value == "true"?"true":"false";
+        if (value == "true") s->on();
+        else s->off();
+        
+        updated = true;
+    }
+
+    if (strcmp(node.getType(),"pwm") == 0){
+        PWMPort *p = thing->pwm.get(property.c_str());
+        if (!p) return; // no such property
+        int dc = value.toInt();
+        if (dc>0) p->setDutyCycle(dc);
+        else p->off();
+        newValue = String(p->getDutyCycle());
+        
+        updated = true;
+
     }
 
     if (updated) {
@@ -137,4 +148,8 @@ void handleSwitchOn(Switch* s){
 
 void handleSwitchOff(Switch* s){
     thing->homieSwitches.setProperty(s->getId()).send("false");
+}
+
+void handlePWM(PWMPort* p){
+    thing->homiePWM.setProperty(p->getId()).send(String(p->getDutyCycle()));
 }

@@ -24,7 +24,7 @@ class Switch: public Item {
         void setMomentary(unsigned int timeout=10){momentaryTimeout=timeout;};
 
         // from Item
-        virtual void loop();
+        virtual void loop() override;
 
 };
 
