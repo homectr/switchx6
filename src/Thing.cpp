@@ -9,45 +9,45 @@
 Thing::Thing(){
 
     for (uint8_t i = 0; i < NUMBER_OF_ITEMS; i++) {
-        items[i] = nullptr; // no item so far
+        items[i] = NULL; // no item so far
         // create configuration setting for each item
-        const char *id = strdup(String(i+1).c_str());
-        scfg[i] = new HomieSetting<const char*>(id, strdup(String(String("Configuration for item #")+id).c_str()));
+        const char *id = strdup(String(String("item")+(i+1)).c_str());
+        const char *desc = strdup(String(String("Configuration for item #")+id).c_str());
+        itemCfg[i] = new HomieSetting<const char*>(id, desc);
+        DEBUG_PRINT("[Thing:Thing] Creating config item: id=%s desc=%s\n",id, desc);
     }
 
     // create properties for device
+    homieDevice.advertise("cmd").setDatatype("string").settable(cmdHandler);
     homieDevice.advertise("seq").setDatatype("string").settable(sequenceHandler);
     homieDevice.advertise("seqStatus").setDatatype("integer");
-    homieDevice.advertise("cmd").setDatatype("string").settable(cmdHandler);
 
+    /*
     sequence.handleOnStart(handleSequenceStart);
     sequence.handleOnStop(handleSequenceStop);
     sequence.handleOnStepStart(handleStepStart);
     sequence.handleOnStepStop(handleStepStop);
-    DEBUG_PRINT("Thing created\n");
+    */
+    DEBUG_PRINT("[Thing:Thing] Thing created\n");
 }
 
-Switch* Thing::createSwitch(const char* cfg){
-    DEBUG_PRINT("Creating switch from configuraion= %s\n",cfg);
+Switch* Thing::createSwitch(const char* cfgDelim){
+    GPIOSwitch *sw = NULL;
 
-    GPIOSwitch *sw = nullptr;
+    const char* id = strtok(NULL, cfgDelim);
+    const char* gpioStr = strtok(NULL, cfgDelim);
 
-    char itemId[10];
-    if (!getToken(itemId,10,cfg,':',1)) return sw;
+    if (!id || !gpioStr) return sw;
 
-    char buff[10];
-    if (!getToken(buff,4,cfg,':',2)) return sw;
-    int gpio = atoi(buff);
-    if (gpio<0) return sw;
-
+    int gpio = atoi(gpioStr);
+    if (gpio < 0) return sw;
 
     // initialize GPIO
     pinMode(gpio, OUTPUT);
     digitalWrite(gpio, LOW);
 
     // create switch for GPIO
-    const char *id = strdup(itemId);
-    sw = new GPIOSwitch(gpio,id);
+    sw = new GPIOSwitch(gpio,strdup(id));
     sw->setCbOff(handleSwitchOff);
     sw->setCbOn(handleSwitchOn);
     DEBUG_PRINT("Switch created: id=%s gpio=%d", id, gpio);
@@ -55,9 +55,11 @@ Switch* Thing::createSwitch(const char* cfg){
     switches.add(id,sw);
 
     // if 3rd token is 'm' then it is a momentary switch
-    if (getToken(buff,3,cfg,':',3) && strcmp(buff,"m")){
-        if (getToken(buff,6,cfg,':',4)){
-            long mt = atol(buff);
+    const char* momt = strtok(NULL,cfgDelim);
+    if (strcmp(momt,"m")){
+        const char* mtStr = strtok(NULL,cfgDelim);
+        if (mtStr){
+            long mt = atol(mtStr);
             if (mt>0) {
                 sw->setMomentary(mt);
                 DEBUG_PRINT(" momentary=%lu",mt);
@@ -76,43 +78,57 @@ Switch* Thing::createSwitch(const char* cfg){
 
 Item* Thing::createItem(const char* cfg){
     DEBUG_PRINT("Creating item using config=%s\n",cfg);
+    const char* cfgDelim=":";
 
     #define CFG_BUFF_SIZE 50 // size of local buffer
-    Item *item = nullptr;
+    Item *item = NULL;
 
     if (!cfg) return item;
-    char itemType[10];
-    int tl = getToken(itemType,10,cfg,':',1);
-    
-    if (tl <= 0) return item;
 
-    if (strcmp(itemType,"switch") == 0){
-        return (Item*)createSwitch(cfg+tl+2);
+    // create modifiable config string
+    char cb[CFG_BUFF_SIZE];
+    strcpy(cb,cfg);
+
+    char *tok = strtok(cb,cfgDelim);
+    
+    if (!tok || *tok==0) return item;
+
+    if (strcmp(tok,"switch") == 0){
+        return (Item*)createSwitch(cfgDelim);
     }
 
     return item;
 }
 
 void Thing::setup(){
-    DEBUG_PRINT("[Thing] SETUP\n");
+    DEBUG_PRINT("[Thing:Setup] SETUP\n");
 
     if (!Homie.isConfigured()){
-        CONSOLE("Homie not configured. Skipping Thing setup.\n");
+        CONSOLE("Homie not configured. Skipping Thing setup. Loop will be ignored.\n");
         return;
     }
 
+    DEBUG_PRINT("[Thing:Setup] Creating items\n");
+
     for (int i=0; i<NUMBER_OF_ITEMS;i++){
-        if (scfg[i]) items[i] = createItem(scfg[i]->get());
+        if (itemCfg[i]) items[i] = createItem(itemCfg[i]->get());
     }
 
     switchIterator = new ListIterator<GPIOSwitch>(switches);
+
+    DEBUG_PRINT("[Thing:Setup] Completed\n");
+
+    configured = true;
 }
 
 void Thing::loop(){
-    
+    if (!isConfigured()) return;
+    DEBUG_PRINT(" TL ");
     for (int i=0;i<NUMBER_OF_ITEMS;i++){
-        DEBUG_PRINT("L=%d",i);
-        if (items[i]) items[i]->loop();
+        if (items[i]) {
+            DEBUG_PRINT(" ITL=%d",i);
+            items[i]->loop();
+        }
     }
 
     sequence.loop();
