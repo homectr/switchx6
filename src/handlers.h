@@ -3,6 +3,7 @@
 #include <Homie.h>
 #include "Sequence.h"
 #include "Switch.h"
+#include "PWMPort.h"
 
 bool sequenceHandler(const HomieRange &range, const String &value);
 bool cmdHandler(const HomieRange &range, const String &value);

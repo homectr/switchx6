@@ -93,9 +93,12 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
     bool updated = false;
     String newValue = value;
 
-    if (strcmp(node.getType(),"switch") == 0){
+    if (strcmp(node.getId(),"switches") == 0){
         GPIOSwitch *s = thing->switches.get(property.c_str());
-        if (!s) return; // no such proprety
+        if (!s) {
+            DEBUG_PRINT("Switch not found id=%s\n",property.c_str());
+            return false; // no such proprety
+        }
         newValue = value == "true"?"true":"false";
         if (value == "true") s->on();
         else s->off();
@@ -103,9 +106,12 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
         updated = true;
     }
 
-    if (strcmp(node.getType(),"pwm") == 0){
+    if (strcmp(node.getId(),"pwm") == 0){
         PWMPort *p = thing->pwm.get(property.c_str());
-        if (!p) return; // no such property
+        if (!p) {
+            DEBUG_PRINT("Port not found id=%s\n",property.c_str());
+            return false; // no such property
+        }
         int dc = value.toInt();
         if (dc>0) p->setDutyCycle(dc);
         else p->off();
@@ -124,32 +130,39 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
 }
 
 void handleSequenceStart(){
+    DEBUG_PRINT("[handleSeqStart] START\n");
     thing->homieDevice.setProperty("seqStatus").send("1");
 }
 
 void handleSequenceStop(){
+    DEBUG_PRINT("[handleSeqStop] STOP\n");
     thing->homieDevice.setProperty("seqStatus").send("0");
     thing->sequence.clear();
 }
 
 void handleStepStart(SeqStep<unsigned char> *step){
     digitalWrite(step->item,1);
+    DEBUG_PRINT("[handleStepStart] step=%d START\n",step->id);
     thing->homieSwitches.setProperty(String(step->item)).send("true");
 }
 
 void handleStepStop(SeqStep<unsigned char> *step){
     digitalWrite(step->item,0);
+    DEBUG_PRINT("[handleStepStop] step=%d STOP\n",step->id);
     thing->homieSwitches.setProperty(String(step->item)).send("false");
 }
 
 void handleSwitchOn(Switch* s){
+    DEBUG_PRINT("[handleSwitch] id=%s ON\n",s->getId());
     thing->homieSwitches.setProperty(s->getId()).send("true");
 }
 
 void handleSwitchOff(Switch* s){
+    DEBUG_PRINT("[handleSwitch] id=%s OFF\n",s->getId());
     thing->homieSwitches.setProperty(s->getId()).send("false");
 }
 
 void handlePWM(PWMPort* p){
+    DEBUG_PRINT("[handlePWM] id=%s dc=%d\n",p->getId(), p->getDutyCycle());
     thing->homiePWM.setProperty(p->getId()).send(String(p->getDutyCycle()));
 }
