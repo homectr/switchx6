@@ -2,7 +2,7 @@
 
 class Item {
     protected:
-        const char* id = NULL;
+        const char* id;
     public:
         virtual void loop(){};
         Item(const char* id){this->id=id;}

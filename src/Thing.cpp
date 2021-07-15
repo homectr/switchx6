@@ -51,11 +51,11 @@ Switch* Thing::createSwitch(const char* cfgDelim){
     sw->setCbOn(handleSwitchOn);
     DEBUG_PRINT("Switch created: id=%s gpio=%d", id, gpio);
     
-    switches.add(id,sw);
+    switches.add(sw->getId(),sw);
 
     // if 3rd token is 'm' then it is a momentary switch
     const char* momt = strtok(NULL,cfgDelim);
-    if (strcmp(momt,"m") == 0){
+    if (momt && strcmp(momt,"m") == 0){
         const char* mtStr = strtok(NULL,cfgDelim);
         if (mtStr){
             long mt = atol(mtStr);
@@ -92,11 +92,11 @@ PWMPort* Thing::createPWM(const char* cfgDelim){
 
     DEBUG_PRINT("PWM created: id=%s gpio=%d", id, gpio);
     
-    pwm.add(id,sw);
+    pwm.add(sw->getId(),sw);
 
     const char* dcStr = strtok(NULL,cfgDelim);
     if (dcStr){
-        unsigned int dc = atol(dcStr);
+        int dc = atoi(dcStr);
         if (dc>0 && dc <=100) {
             sw->setDutyCycle(dc);
             DEBUG_PRINT(" duty=%lu",dc);
