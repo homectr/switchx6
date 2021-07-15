@@ -160,6 +160,7 @@ void Sequence<T>::start(SeqStep<T> *pos){
 template <class T>
 void Sequence<T>::loop(){
     if (!isRunning) return;
+    if (!pos) stop(); // if no steps in the sequence
 
     runningDuration = millis()-posStartedAt;
     if ( runningDuration > pos->duration){

@@ -16,3 +16,5 @@ void handleStepStop(SeqStep<unsigned char> *step);
 
 void handleSwitchOn(Switch* s);
 void handleSwitchOff(Switch* s);
+
+void handlePWM(PWMPort* p);
