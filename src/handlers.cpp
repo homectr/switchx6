@@ -93,7 +93,7 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
     bool updated = false;
     String newValue = value;
 
-    if (strcmp(node.getId(),"switches") == 0){
+    if (strcmp(node.getId(),"switch") == 0){
         GPIOSwitch *s = thing->switches.get(property.c_str());
         if (!s) {
             DEBUG_PRINT("Switch not found id=%s\n",property.c_str());
@@ -113,6 +113,7 @@ bool updateHandler(const HomieNode &node, const HomieRange &range, const String 
             return false; // no such property
         }
         int dc = value.toInt();
+        
         if (dc>0) p->setDutyCycle(dc);
         else p->off();
         newValue = String(p->getDutyCycle());

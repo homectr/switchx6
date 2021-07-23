@@ -19,7 +19,7 @@ class Thing {
         List<PWMPort> pwm;
 
         HomieNode homieDevice = HomieNode("thing", "Thing", "thing");
-        HomieNode homieSwitches = HomieNode("switches", "Switches", "switch");
+        HomieNode homieSwitches = HomieNode("switch", "Switches", "switch");
         HomieNode homiePWM = HomieNode("pwm", "PWM Ports", "pwm");
         HomieSetting<const char*> *itemCfg[NUMBER_OF_ITEMS];
 

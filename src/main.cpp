@@ -6,6 +6,8 @@
 //#define NODEBUG_PRINT
 #include "debug_print.h"
 
+#define HOMIE_LED_PIN   15
+
 Thing* thing = NULL;
 
 HomieNode homieDevice = HomieNode("device", "Device", "device");
@@ -16,7 +18,7 @@ void setup() {
 
     Homie_setFirmware("Thing", "1.0.0");
     Homie.setGlobalInputHandler(updateHandler);
-    Homie.setLedPin(15, 1);
+    Homie.setLedPin(HOMIE_LED_PIN, 1);
 
     thing = new Thing();
 
@@ -33,9 +35,9 @@ void loop() {
     Homie.loop();
     thing->loop();
     #ifndef NODEBUG_PRINT
-    if (millis()-ms > 5000){
+    if (millis()-ms > 15000){
         ms = millis();
-        DEBUG_PRINT("[main] alive\n");
+        DEBUG_PRINT("[main] alive ms=%lu\n",millis());
     }
     #endif
     

@@ -11,8 +11,9 @@ PWMPort::PWMPort(const char* id, unsigned char gpio):Item(id){
 };
 
 void PWMPort::setDutyCycle(unsigned int dutyCycle){
-    if (dutyCycle>0) dutyCycle=100;
-    analogWrite(gpio,dutyCycle);
+    if (dutyCycle>100) this->dutyCycle=100;
+    else this->dutyCycle = dutyCycle;
+    analogWrite(gpio,this->dutyCycle);
     if (onChange) onChange(this);
 };
 
