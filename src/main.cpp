@@ -6,7 +6,7 @@
 //#define NODEBUG_PRINT
 #include "debug_print.h"
 
-#define HOMIE_LED_PIN   15
+#define HOMIE_LED_PIN   2
 
 Thing* thing = NULL;
 
