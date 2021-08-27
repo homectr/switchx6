@@ -4,26 +4,25 @@ Node|Property|Description
 ----|--------|-----------
 device|seq|Property used for sending sequence definitions.<br/>`mqtt topic=homie/device/seq/set`
 device|seqStatus|Property exposing sequence processing status 0-100% <br/>`mqtt topic=homie/device/seqStatus`
-device|cmd|Property used forsending commands to device.<br/>`mqtt topic=homie/device/cmd/set`
+device|cmd|Property used for sending commands to device.<br/>`mqtt topic=homie/device/cmd/set`
 switch|1-6|Property for accessing specific switch 1-6.<br/>`mqtt topic=homie/switch/1`<br/>`mqtt topic=homie/switch/1/set`
 
 ## Custom Settings
-Homie configuration file can be used to set switches to momentary mode (not latching).
+Homie configuration file can be used to set switches (ids "s1" & "s2") to momentary mode (not latching).
 It is possible to set a timeout for each switch after which such switch will be released.
 
 **Example**
-Following example sets switches 1 & 2 to momentary mode, releasing after 100ms.
-All other switches are non-momentary. 
-If no configuration is provided, then all switches are non-momentary by default.
+Following example sets switches s1 (gpio 14) & s2 (gpio 12) to momentary mode, releasing after 1000ms resp. 100ms.
+Switches s3 (gpio 13) & s4 (gpio 4) are non-momentary.
 
 ```
     "settings": {
-        "1":"m:100",
-        "2":"m:100",
-        "3":"nm",
-        "4":"nm",
-        "5":"nm",
-        "6":"nm"
+        "item1":"switch:s1:14:nm:1000",
+        "item2":"switch:s2:12:nm:100",
+        "item3":"switch:s3:13",
+        "item4":"switch:s4:4",
+        "item5":"pwm:pwm1:5",
+        "item6":"pwm:pwm2:15"
     }
 ```
 
