@@ -5,22 +5,26 @@ Node|Property|Description
 device|seq|Property used for sending sequence definitions.<br/>`mqtt topic=homie/device/seq/set`
 device|seqStatus|Property exposing sequence processing status 0-100% <br/>`mqtt topic=homie/device/seqStatus`
 device|cmd|Property used for sending commands to device.<br/>`mqtt topic=homie/device/cmd/set`
-switch|1-6|Property for accessing specific switch 1-6.<br/>`mqtt topic=homie/switch/1`<br/>`mqtt topic=homie/switch/1/set`
+switch|{id}|Property for accessing specific switch.<br/>`mqtt topic=homie/switch/s1`<br/>`mqtt topic=homie/switch/s1/set`
 
 ## Custom Settings
-Homie configuration file can be used to set switches (ids "s1" & "s2") to momentary mode (not latching).
-It is possible to set a timeout for each switch after which such switch will be released.
+Homie configuration file can be used to set switches to momentary mode (not latching).
+It is possible to set a timeout for each mementary switch after which such switch will be released.
+If no timeout is specified, momentary switch releases after 10ms.
+All switches are by default non-momentary (latching).
 
 **Example**
-Following example sets switches s1 (gpio 14) & s2 (gpio 12) to momentary mode, releasing after 1000ms resp. 100ms.
+Following example sets switches s1 (gpio 14) & s2 (gpio 12) to momentary mode, releasing after 1000ms resp. 10ms.
 Switches s3 (gpio 13) & s4 (gpio 4) are non-momentary.
+Switches s1 and s4 are set to inverse mode: 0 => ON, 1 => OFF
+Switch s4 is also set to ON during start. Switches are set to OFF unless parameter `ison` is specified.
 
 ```
     "settings": {
-        "item1":"switch:s1:14:nm:1000",
-        "item2":"switch:s2:12:nm:100",
+        "item1":"switch:s1:14:inv:m:1000",
+        "item2":"switch:s2:12:m",
         "item3":"switch:s3:13",
-        "item4":"switch:s4:4",
+        "item4":"switch:s4:4:inv:ison",
         "item5":"pwm:pwm1:5",
         "item6":"pwm:pwm2:15"
     }

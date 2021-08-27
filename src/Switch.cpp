@@ -27,6 +27,8 @@ void Switch::loop(){
 
 GPIOSwitch::GPIOSwitch(unsigned char gpioPin, const char* id, unsigned char inverse):Switch(id){
     pin = gpioPin;
+    pinMode(pin,OUTPUT);
+    digitalWrite(pin,inverse);
     this->inverse = inverse;
 }
 

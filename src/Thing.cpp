@@ -35,38 +35,50 @@ Switch* Thing::createSwitch(const char* cfgDelim){
 
     const char* id = strtok(NULL, cfgDelim);
     const char* gpioStr = strtok(NULL, cfgDelim);
+    bool inverse = false;
+    long mt = 0;
+    bool isOn = false;
 
     if (!id || !gpioStr) return sw;
 
     int gpio = atoi(gpioStr);
     if (gpio < 0) return sw;
 
-    // initialize GPIO
-    pinMode(gpio, OUTPUT);
-    digitalWrite(gpio, LOW);
+    DEBUG_PRINT("Switch: id=%s gpio=%d", id, gpio);
+    char* tok = strtok(NULL, cfgDelim);
+    while (tok){
+        if (strcmp(tok,"inv") == 0){
+            inverse = true;
+            DEBUG_PRINT(" inverse");
+        }
+        
+        if (strcmp(tok,"m") == 0){
+            const char* mtStr = strtok(NULL,cfgDelim);
+            if (mtStr) mt = atol(mtStr);
+            else mt=10;
+            if (mt>0) DEBUG_PRINT(" momentary=%lu",mt);               
+        }
+
+        if (strcmp(tok,"ison") == 0){
+            isOn = true;
+            DEBUG_PRINT(" is=ON");               
+        }
+
+        DEBUG_PRINT("\n");
+        tok = strtok(NULL, cfgDelim);
+    }
 
     // create switch for GPIO
-    sw = new GPIOSwitch(gpio,strdup(id));
+    sw = new GPIOSwitch(gpio,strdup(id),inverse);
     sw->setCbOff(handleSwitchOff);
     sw->setCbOn(handleSwitchOn);
-    DEBUG_PRINT("Switch created: id=%s gpio=%d", id, gpio);
-    
+    if (mt) sw->setMomentary(mt);
+    if (isOn) sw->on();
+    else sw->off();
+        
     switches.add(sw->getId(),sw);
-
-    // if 3rd token is 'm' then it is a momentary switch
-    const char* momt = strtok(NULL,cfgDelim);
-    if (momt && strcmp(momt,"m") == 0){
-        const char* mtStr = strtok(NULL,cfgDelim);
-        if (mtStr){
-            long mt = atol(mtStr);
-            if (mt>0) {
-                sw->setMomentary(mt);
-                DEBUG_PRINT(" momentary=%lu",mt);
-            }
-
-        }
-    }
-    DEBUG_PRINT("\n");
+    
+    DEBUG_PRINT("... created\n");
 
     // configure Homie property for the switch
     homieSwitches.advertise(id).setDatatype("boolean").setRetained(true).settable();       
