@@ -16,7 +16,7 @@ void setup() {
     Serial.begin(115200);
     Serial << endl << endl;
 
-    Homie_setFirmware("Thing", "1.0.0");
+    Homie_setFirmware("sxpwm", "1.0.0");
     Homie.setGlobalInputHandler(updateHandler);
     Homie.setLedPin(HOMIE_LED_PIN, 1);
 
