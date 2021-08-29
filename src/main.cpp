@@ -1,5 +1,6 @@
 
 #include <Homie.h>
+#include <Syslog.h>
 #include "Thing.h"
 #include "handlers.h"
 
@@ -18,6 +19,14 @@
 Thing* thing = NULL;
 
 HomieNode homieDevice = HomieNode("device", "Device", "device");
+HomieSetting<const char*> syslogSrv("syslogsrv", "Syslog server hostname/ip"); 
+HomieSetting<long> syslogPort("syslogport", "Syslog port"); 
+
+// A UDP instance to let us send and receive packets over UDP
+WiFiUDP udpClient;
+
+// Create a new empty syslog instance
+Syslog syslog(udpClient, SYSLOG_PROTO_IETF);
 
 void setup() {
     Serial.begin(115200);
@@ -26,6 +35,12 @@ void setup() {
     Homie_setFirmware(FIRMWARE_NAME, FIRMWARE_VERSION);
     Homie.setGlobalInputHandler(updateHandler);
     Homie.setLedPin(HOMIE_LED_PIN, 1);
+
+    syslogSrv.setDefaultValue("");
+    syslogPort.setDefaultValue(514).setValidator([] (long p) {
+        return (p >= 0) && (p <= 0xFFFF);
+    });
+
 
     thing = new Thing();
 
@@ -40,6 +55,7 @@ unsigned long ms = millis();
 
 void loop() {
     Homie.loop();
+    Homie.onEvent(onHomieEvent);
     thing->loop();
     #ifndef NODEBUG_PRINT
     if (millis()-ms > ALIVE_TIMER){

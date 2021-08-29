@@ -19,3 +19,5 @@ void handleSwitchOn(Switch* s);
 void handleSwitchOff(Switch* s);
 
 void handlePWM(PWMPort* p);
+
+void onHomieEvent(const HomieEvent& event);
