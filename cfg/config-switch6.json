@@ -1,0 +1,25 @@
+{
+    "name": "Test SW",
+    "device_id": "testsw",
+    "device_stats_interval": 300,
+    "wifi": {
+      "ssid": "wAPk1cw0S",
+      "password": "20W1relessAP05"
+    },
+    "mqtt": {
+      "host": "172.16.26.98",
+      "port": 1883
+    },
+    "ota": {
+      "enabled": true
+    },
+    "settings": {
+        "item1":"switch:s1:14:ison:inv:nm:1000",
+        "item2":"switch:s2:12:nm:100",
+        "item3":"switch:s3:13",
+        "item4":"switch:s4:4:inv:ison",
+        "item5":"pwm:pwm1:5",
+        "item6":"pwm:pwm2:15"
+    }
+
+  }

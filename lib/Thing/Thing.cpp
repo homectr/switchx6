@@ -111,7 +111,7 @@ PWMPort* Thing::createPWM(const char* cfgDelim){
         int dc = atoi(dcStr);
         if (dc>0 && dc <=100) {
             sw->setDutyCycle(dc);
-            DEBUG_PRINT(" duty=%lu",dc);
+            DEBUG_PRINT(" duty=%d",dc);
         }        
     }
     DEBUG_PRINT("\n");
@@ -120,6 +120,44 @@ PWMPort* Thing::createPWM(const char* cfgDelim){
     homiePWM.advertise(id).setDatatype("integer").setFormat("0:100").setRetained(true).settable();       
 
     return sw;
+
+}
+
+BLEScanner* Thing::createBLEScanner(const char* cfgDelim){
+    BLEScanner *itm = NULL;
+
+    const char* id = strtok(NULL, cfgDelim);
+    const char* rxPinStr = strtok(NULL, cfgDelim);
+    const char* txPinStr = strtok(NULL, cfgDelim);
+    const char* speedStr = strtok(NULL, cfgDelim);
+    const char* groupStr = strtok(NULL, cfgDelim);
+
+    if (!id || !txPinStr || !rxPinStr || !speedStr || !groupStr) return itm;
+
+    int txPin = atoi(txPinStr);
+    if (txPin < 0) return itm;
+
+    int rxPin = atoi(rxPinStr);
+    if (rxPin < 0) return itm;
+
+    int speed = atoi(speedStr);
+    if (speed < 0 || speed > 115200) return itm;
+
+    int group = atoi(groupStr);
+    if (group < 0 || group > 3) return itm;
+
+    // create BLE scanner
+    itm = new BLEScanner(strdup(id), rxPin, txPin, speed, group);
+
+    DEBUG_PRINT("BLES created: id=%s rx=%d tx=%d speed=%d group=%d\n", id, rxPin, txPin, speed, group);
+    bles.add(itm->getId(),itm);
+
+    // configure Homie property for the switch
+    homieBLES.advertise(id).setDatatype("integer");
+
+    itm->begin();
+
+    return itm;
 
 }
 
@@ -147,6 +185,10 @@ Item* Thing::createItem(const char* cfg){
 
     if (strcmp(tok,"pwm") == 0){
         return (Item*)createPWM(cfgDelim);
+    }
+
+    if (strcmp(tok,"bles") == 0){
+        return (Item*)createBLEScanner(cfgDelim);
     }
 
     return item;

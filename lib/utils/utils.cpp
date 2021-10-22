@@ -36,3 +36,15 @@ int getToken(char* dst, size_t dstSize, const char* src, char separator, int pos
     return 0;
 
 }
+
+int findBytes(unsigned char *haystack, size_t haystackSize, unsigned char* needle, size_t needleSize){
+    size_t i = 0;
+    if (haystackSize < needleSize) return -1;
+    while (i < haystackSize){
+        size_t j = 0;
+        while (j<needleSize && *(haystack+i+j) == *(needle+j)) j++;
+        if (j == needleSize) return i;
+        i++;
+    }
+    return -1;
+}

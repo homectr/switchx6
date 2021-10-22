@@ -6,8 +6,9 @@
 #include "Switch.h"
 #include "Sequence.h"
 #include "PWMPort.h"
+#include "BLEScanner.h"
 
-#define NUMBER_OF_ITEMS 6
+#define NUMBER_OF_ITEMS 1
 
 class Thing {
     public:
@@ -17,10 +18,12 @@ class Thing {
         Sequence<unsigned char> sequence = Sequence<unsigned char>("switches");
 
         List<PWMPort> pwm;
+        List<BLEScanner> bles;
 
         HomieNode homieDevice = HomieNode("thing", "Thing", "thing");
         HomieNode homieSwitches = HomieNode("switch", "Switches", "switch");
         HomieNode homiePWM = HomieNode("pwm", "PWM Ports", "pwm");
+        HomieNode homieBLES = HomieNode("bles", "BLE Scanners", "bles");
         HomieSetting<const char*> *itemCfg[NUMBER_OF_ITEMS];
 
     protected:
@@ -32,6 +35,7 @@ class Thing {
         Item* createItem(const char* cfg);
         Switch* createSwitch(const char* cfg);
         PWMPort* createPWM(const char* cfg);
+        BLEScanner* createBLEScanner(const char* cfg);
 
     public:
         Thing();

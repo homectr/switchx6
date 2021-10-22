@@ -13,3 +13,5 @@
  */
 
 int getToken(char* dst, size_t dstSize, const char* src, char separator, int pos);
+
+int findBytes(unsigned char *haystack, size_t haystackSize, unsigned char* needle, size_t needleSize);
