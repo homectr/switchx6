@@ -44,6 +44,7 @@ void setup()
 
     thing = new Thing();
 
+    Homie.onEvent(onHomieEvent);
     Homie.setup();
     thing->setup(); // call device setup only after Homie setup has been called
 
@@ -56,7 +57,6 @@ unsigned long ms = millis();
 void loop()
 {
     Homie.loop();
-    Homie.onEvent(onHomieEvent);
     thing->loop();
 #ifndef NODEBUG_PRINT
     if (millis() - ms > ALIVE_TIMER)
