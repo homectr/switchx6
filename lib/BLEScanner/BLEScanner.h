@@ -12,7 +12,7 @@ struct DISARec {
     unsigned char devType;
     char rssi;
     unsigned char flags;
-    char localName[17]
+    char localName[17];
     unsigned char dataLength;
     unsigned char data[8];
 };
