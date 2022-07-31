@@ -15,5 +15,6 @@ void PWMPort::setDutyCycle(unsigned int dutyCycle){
     else this->dutyCycle = dutyCycle;
     analogWrite(gpio,this->dutyCycle);
     if (onChange) onChange(this);
+    if (this->logger) logger->logf_P(LOG_DEBUG,PSTR("PWM:%s DC set %d"),this->id,this->dutyCycle);
 };
 

@@ -27,6 +27,8 @@ void Switch::loop(){
 
 GPIOSwitch::GPIOSwitch(unsigned char gpioPin, const char* id, unsigned char inverse):Switch(id){
     pin = gpioPin;
+    pinMode(pin,OUTPUT);
+    digitalWrite(pin,inverse);
     this->inverse = inverse;
 }
 
@@ -34,11 +36,13 @@ void GPIOSwitch::on(){
     Switch::on();
     digitalWrite(pin,!inverse);
     DEBUG_PRINT("[GPIO-%d] on\n",pin);
+    if (this->logger) logger->logf_P(LOG_DEBUG,PSTR("switch:%s ON"),this->id);
 }
 
 void GPIOSwitch::off(){
     digitalWrite(pin,inverse);
     Switch::off();
     DEBUG_PRINT("[GPIO-%d] off\n",pin);
+    if (this->logger) logger->logf_P(LOG_DEBUG,PSTR("switch:%s OFF"),this->id);
 }
 

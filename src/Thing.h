@@ -1,15 +1,17 @@
 #pragma once
 
 #include <Homie.h>
+#include <Syslog.h>
 #include "List.h"
 #include "Item.h"
 #include "Switch.h"
 #include "Sequence.h"
 #include "PWMPort.h"
+#include "Logger.h"
 
 #define NUMBER_OF_ITEMS 6
 
-class Thing {
+class Thing:public Logger {
     public:
         Item* items[NUMBER_OF_ITEMS];
 
@@ -21,7 +23,7 @@ class Thing {
         HomieNode homieDevice = HomieNode("thing", "Thing", "thing");
         HomieNode homieSwitches = HomieNode("switch", "Switches", "switch");
         HomieNode homiePWM = HomieNode("pwm", "PWM Ports", "pwm");
-        HomieSetting<const char*> *itemCfg[NUMBER_OF_ITEMS];
+        HomieSetting<const char*> *itemCfg[NUMBER_OF_ITEMS];  
 
     protected:
         unsigned long seqStatusUpdatedOn = 0;
@@ -38,6 +40,5 @@ class Thing {
         void setup(); // call after Homie.setup()
         void loop();
         bool isConfigured(){return configured;};
-
 };
 
