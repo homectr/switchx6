@@ -13,12 +13,12 @@ It is possible to set a timeout for each switch after which such switch will be 
 
 **Example**
 Following example sets switches s1 (gpio 14) & s2 (gpio 12) to momentary mode, releasing after 1000ms resp. 100ms.
-Switches s3 (gpio 13) & s4 (gpio 4) are non-momentary.
+Switches s3 (gpio 13) & s4 (gpio 4) are non-momentary/latching.
 
 ```
     "settings": {
-        "item1":"switch:s1:14:nm:1000",
-        "item2":"switch:s2:12:nm:100",
+        "item1":"switch:s1:14:m:1000",
+        "item2":"switch:s2:12:m:100",
         "item3":"switch:s3:13",
         "item4":"switch:s4:4",
         "item5":"pwm:pwm1:5",
