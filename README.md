@@ -6,6 +6,17 @@ device|seq|Property used for sending sequence definitions.<br/>`mqtt topic=homie
 device|seqStatus|Property exposing sequence processing status 0-100% <br/>`mqtt topic=homie/device/seqStatus`
 device|cmd|Property used for sending commands to device.<br/>`mqtt topic=homie/device/cmd/set`
 switch|{id}|Property for accessing specific switch.<br/>`mqtt topic=homie/switch/s1`<br/>`mqtt topic=homie/switch/s1/set`
+pwm|{id}|Property for accessing specific pwm port. Allowed values are 0-100.<br/>`mqtt topic=homie/pwm/pwm1`<br/>`mqtt topic=homie/pwm/pwm1/set`
+
+## Pins/GPIOs
+
+GPIO|Usage
+----|-----
+0|Config mode button - if LOW for more than 10s config mode is started
+2|Status LED - slow blinking = connecting to Wifi,<br/>rapid blinking = connecting to MQTT
+
+For use in your applications, please, check GPIO usage in ESP documentation.
+Usefull info about which GPIOs can be used for what can be found also here https://randomnerdtutorials.com/esp8266-pinout-reference-gpios/
 
 ## Custom Settings
 Homie configuration file can be used to set switches to momentary mode (not latching).
@@ -18,6 +29,7 @@ Following example sets switches s1 (gpio 14) & s2 (gpio 12) to momentary mode, r
 Switches s3 (gpio 13) & s4 (gpio 4) are non-momentary.
 Switches s1 and s4 are set to inverse mode: 0 => ON, 1 => OFF
 Switch s4 is also set to ON during start. Switches are set to OFF unless parameter `ison` is specified.
+PWM is configured on gpio 5 and 16.
 
 ```
     "settings": {
@@ -26,7 +38,7 @@ Switch s4 is also set to ON during start. Switches are set to OFF unless paramet
         "item3":"switch:s3:13",
         "item4":"switch:s4:4:inv:ison",
         "item5":"pwm:pwm1:5",
-        "item6":"pwm:pwm2:15"
+        "item6":"pwm:pwm2:16"
     }
 ```
 
