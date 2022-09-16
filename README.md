@@ -19,17 +19,19 @@ For use in your applications, please, check GPIO usage in ESP documentation.
 Usefull info about which GPIOs can be used for what can be found also here https://randomnerdtutorials.com/esp8266-pinout-reference-gpios/
 
 ## Custom Settings
+
 Homie configuration file can be used to set switches to momentary mode (not latching).
 It is possible to set a timeout for each mementary switch after which such switch will be released.
 If no timeout is specified, momentary switch releases after 10ms.
 All switches are by default non-momentary (latching).
 
 **Example**
-Following example sets switches s1 (gpio 14) & s2 (gpio 12) to momentary mode, releasing after 1000ms resp. 10ms.
-Switches s3 (gpio 13) & s4 (gpio 4) are non-momentary.
-Switches s1 and s4 are set to inverse mode: 0 => ON, 1 => OFF
-Switch s4 is also set to ON during start. Switches are set to OFF unless parameter `ison` is specified.
-PWM is configured on gpio 5 and 16.
+
+* switches s1 (gpio 14) & s2 (gpio 12) to momentary mode, releasing after 1000ms resp. default 10ms.
+* switches s3 (gpio 13) & s4 (gpio 4) are non-momentary.
+* switches s1 and s4 are set to inverse mode: 0 => ON, 1 => OFF
+* switch s4 is also set to ON during start. Switches are set to OFF unless parameter `ison` is specified.
+* PWM is configured on gpio 5 and 16.
 
 ```
     "settings": {
